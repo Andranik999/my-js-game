@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  position: relative;
+  background-color: black;
+  overflow: hidden;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 100%;
+}
+
+.mushroom {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+}
