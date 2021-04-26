@@ -16,7 +16,7 @@ class Circle {
     document.body.addEventListener("keydown", this.move);
   }
 
-  shouldEat = (subject, methodName) => {
+  canEat = subject => {
     if (!this.element || !subject || !subject.element) {
       return false;
     }
@@ -36,17 +36,42 @@ class Circle {
       mushTop + mushHeight >= ballTop &&
       mushTop <= ballTop + ballHeight
     ) {
-      this.game[methodName](subject);
-
-      this.element.style.height = ballHeight + 10 + "px";
-      this.element.style.width = ballWidth + 10 + "px";
-
-      if (this.speed > 1.5) {
-        this.speed -= 0.5;
-      }
-
       return true;
     }
+  };
+
+  afterEat = () => {
+    this.element.style.height = this.element.offsetHeight + 10 + "px";
+    this.element.style.width = this.element.offsetWidth + 10 + "px";
+
+    if (this.speed > 1.5) {
+      this.speed -= 0.5;
+    }
+  };
+
+  eatingConditions = () => {
+    this.eatMushroom();
+    this.eatAnother();
+  };
+
+  eatMushroom = () => {
+    if (this.mushroom && this.canEat(this.mushroom)) {
+      this.mushroom.eaten();
+      this.afterEat();
+    }
+  };
+  eatAnother = () => {
+    const anotherBall = this.game.balls.find(ball => ball !== this.element);
+    const width = this.element.offsetWidth;
+
+    if (this.canEat(anotherBall) && width > anotherBall.element.offsetWidth) {
+      anotherBall.eaten();
+      this.afterEat();
+    }
+  };
+
+  eaten = () => {
+    this.element.remove();
   };
 
   moveLeft = () => {
@@ -57,9 +82,8 @@ class Circle {
       if (!canMoveLeft) {
         return;
       }
-
+      this.eatingConditions();
       this.element.style.left = left - this.speed + "px";
-      this.shouldEat(this.mushroom, "eatenMushroom");
     }, intervalTime);
   };
 
@@ -71,9 +95,8 @@ class Circle {
       if (!canMoveRight) {
         return;
       }
-
+      this.eatingConditions();
       this.element.style.left = left + this.speed + "px";
-      this.shouldEat(this.mushroom, "eatenMushroom");
     }, intervalTime);
   };
 
@@ -85,9 +108,8 @@ class Circle {
       if (!canMoveDown) {
         return;
       }
-
+      this.eatingConditions();
       this.element.style.top = top + this.speed + "px";
-      this.shouldEat(this.mushroom, "eatenMushroom");
     }, intervalTime);
   };
 
@@ -99,9 +121,8 @@ class Circle {
       if (!canMoveUp) {
         return;
       }
-
+      this.eatingConditions();
       this.element.style.top = top - this.speed + "px";
-      this.shouldEat(this.mushroom, "eatenMushroom");
     }, intervalTime);
   };
 
