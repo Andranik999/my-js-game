@@ -2,19 +2,41 @@ class Circle {
   constructor(left, top, color, speed, keysObj, game) {
     this.mushroom = null;
     this.game = game;
-    this.element = document.createElement("div");
-    document.body.appendChild(this.element);
-    this.element.classList.add("circle");
-    this.element.style.top = top + "px";
-    this.element.style.left = left + "px";
-    this.element.style.backgroundColor = color;
+
+    this.score = 0;
+
+    this.color = color;
+
+    this.createCircle();
+
     this.speed = speed;
     this.keysObj = keysObj;
     this.intervalId = null;
+  }
+
+  createCircle = () => {
+    this.element = document.createElement("div");
+    this.element.classList.add("circle");
+
+    this.element.style.backgroundColor = this.color;
     this.element.style.height = circleSize + "px";
     this.element.style.width = circleSize + "px";
+
+    this.element.style.top =
+      randomIntFromInterval(0, innerHeight - circleSize) + "px";
+    this.element.style.left =
+      randomIntFromInterval(0, innerWidth - circleSize) + "px";
+
+    document.body.appendChild(this.element);
     document.body.addEventListener("keydown", this.move);
+  };
+
+  destroyCircle() {
+    this.element.remove();
+    document.body.removeEventListener("keydown", this.move);
   }
+
+  updateScore = () => {};
 
   canEat = subject => {
     if (!this.element || !subject || !subject.element) {
@@ -43,7 +65,9 @@ class Circle {
   afterEat = () => {
     this.element.style.height = this.element.offsetHeight + 10 + "px";
     this.element.style.width = this.element.offsetWidth + 10 + "px";
-
+    this.score++;
+    document.querySelector(".player1").innerHTML = this.game.ball1.score;
+    document.querySelector(".player2").innerHTML = this.game.ball2.score;
     if (this.speed > 1.5) {
       this.speed -= 0.5;
     }
@@ -60,18 +84,21 @@ class Circle {
       this.afterEat();
     }
   };
-  eatAnother = () => {
-    const anotherBall = this.game.balls.find(ball => ball !== this.element);
-    const width = this.element.offsetWidth;
 
-    if (this.canEat(anotherBall) && width > anotherBall.element.offsetWidth) {
+  eatAnother = () => {
+    let anotherBall = this.game.balls.find(ball => ball !== this);
+    const width = this.element.offsetWidth;
+    if (this.canEat(anotherBall) && this.score > anotherBall.score) {
       anotherBall.eaten();
       this.afterEat();
     }
   };
 
   eaten = () => {
-    this.element.remove();
+    this.destroyCircle();
+    setTimeout(() => {
+      this.createCircle();
+    }, 1000);
   };
 
   moveLeft = () => {

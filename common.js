@@ -1,9 +1,6 @@
 const intervalTime = 10;
 const circleSize = 80;
-
-const getRandomInt = arg => {
-  return Math.round(Math.random() * arg);
-};
+const mushroomSize = 20;
 
 const ball1Keys = {
   leftKey: "ArrowLeft",
@@ -12,3 +9,8 @@ const ball1Keys = {
   downKey: "ArrowDown"
 };
 const ball2Keys = { leftKey: "a", rightKey: "d", upKey: "w", downKey: "s" };
+
+function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}

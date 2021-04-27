@@ -7,8 +7,8 @@ class Game {
 
   createMushroom = () => {
     let mash = new Mushroom(
-      getRandomInt(innerHeight),
-      getRandomInt(innerWidth),
+      randomIntFromInterval(0, innerHeight - mushroomSize),
+      randomIntFromInterval(0, innerWidth - mushroomSize),
       "red",
       this
     );
@@ -32,6 +32,13 @@ document.getElementById("game-btn").addEventListener("click", () => {
     document.getElementById("secondPlayer").value != ""
   ) {
     document.querySelector(".wrap-container").style.display = "none";
+    document.querySelector(".players").style.display = "flex";
+    document.querySelector(".player1").innerHTML = document.getElementById(
+      "firstPlayer"
+    ).value;
+    document.querySelector(".player2").innerHTML = document.getElementById(
+      "secondPlayer"
+    ).value;
     let game = new Game();
     game.start();
   } else {
