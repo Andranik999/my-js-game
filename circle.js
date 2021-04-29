@@ -17,17 +17,23 @@ class Circle {
   createCircle = () => {
     this.element = document.createElement("div");
     this.element.classList.add("circle");
-
+    let zone = document.getElementById("game-zone");
+    zone.appendChild(this.element);
     this.element.style.backgroundColor = this.color;
     this.element.style.height = circleSize + "px";
     this.element.style.width = circleSize + "px";
-
     this.element.style.top =
-      randomIntFromInterval(0, innerHeight - circleSize) + "px";
+      randomIntFromInterval(
+        innerHeight - zone.offsetHeight,
+        zone.offsetHeight - circleSize
+      ) + "px";
     this.element.style.left =
-      randomIntFromInterval(0, innerWidth - circleSize) + "px";
+      randomIntFromInterval(
+        innerWidth - zone.offsetWidth,
+        zone.offsetWidth - circleSize
+      ) + "px";
 
-    document.body.appendChild(this.element);
+    zone.appendChild(this.element);
     document.body.addEventListener("keydown", this.move);
   };
 
@@ -35,8 +41,6 @@ class Circle {
     this.element.remove();
     document.body.removeEventListener("keydown", this.move);
   }
-
-  updateScore = () => {};
 
   canEat = subject => {
     if (!this.element || !subject || !subject.element) {
@@ -66,11 +70,20 @@ class Circle {
     this.element.style.height = this.element.offsetHeight + 10 + "px";
     this.element.style.width = this.element.offsetWidth + 10 + "px";
     this.score++;
-    document.querySelector(".player1").innerHTML = this.game.ball1.score;
-    document.querySelector(".player2").innerHTML = this.game.ball2.score;
+    document.querySelector("#score1").innerHTML = this.game.ball1.score;
+    document.querySelector("#score2").innerHTML = this.game.ball2.score;
     if (this.speed > 1.5) {
       this.speed -= 0.5;
     }
+
+    this.game.balls.forEach((ball, i) => {
+      let player1 = document.getElementById("firstPlayer").value;
+      let player2 = document.getElementById("secondPlayer").value;
+      if (ball.score === 10) {
+        alert("Game over " + [player1, player2][i] + " wins");
+        document.location.reload();
+      }
+    });
   };
 
   eatingConditions = () => {
@@ -87,9 +100,9 @@ class Circle {
 
   eatAnother = () => {
     let anotherBall = this.game.balls.find(ball => ball !== this);
-    const width = this.element.offsetWidth;
     if (this.canEat(anotherBall) && this.score > anotherBall.score) {
       anotherBall.eaten();
+      // anotherBall.score = 0;
       this.afterEat();
     }
   };
@@ -109,47 +122,55 @@ class Circle {
       if (!canMoveLeft) {
         return;
       }
+
       this.eatingConditions();
-      this.element.style.left = left - this.speed + "px";
+      this.element.style.left =
+        left - this.speed < 0 ? 0 : left - this.speed + "px";
     }, intervalTime);
   };
 
   moveRight = () => {
     this.intervalId = setInterval(() => {
       const left = this.element.offsetLeft;
-
-      const canMoveRight = left < window.innerWidth - this.element.clientWidth;
+      const canMoveRight = left < zone.offsetWidth - this.element.clientWidth;
       if (!canMoveRight) {
         return;
       }
       this.eatingConditions();
-      this.element.style.left = left + this.speed + "px";
+
+      console.log(zone.offsetWidth);
+      this.element.style.left =
+        left + this.speed > zone.offsetWidth - this.element.clientWidth
+          ? zone.offsetWidth - this.element.clientWidth + "px"
+          : left + this.speed + "px";
     }, intervalTime);
   };
 
   moveDown = () => {
     this.intervalId = setInterval(() => {
       const top = this.element.offsetTop;
-
-      const canMoveDown = top < window.innerHeight - this.element.clientHeight;
+      const canMoveDown = top < zone.offsetHeight - this.element.clientHeight;
       if (!canMoveDown) {
         return;
       }
       this.eatingConditions();
-      this.element.style.top = top + this.speed + "px";
+      this.element.style.top =
+        top + this.speed > zone.offsetHeight - this.element.clientHeight
+          ? zone.offsetHeight - this.element.clientHeight + "px"
+          : top + this.speed + "px";
     }, intervalTime);
   };
 
   moveUp = () => {
     this.intervalId = setInterval(() => {
       const top = this.element.offsetTop;
-
       const canMoveUp = top > 0;
       if (!canMoveUp) {
         return;
       }
       this.eatingConditions();
-      this.element.style.top = top - this.speed + "px";
+      this.element.style.top =
+        top - this.speed < 0 ? 0 : top - this.speed + "px";
     }, intervalTime);
   };
 

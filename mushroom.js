@@ -1,7 +1,7 @@
 class Mushroom {
   constructor(top, left, color, game) {
     this.element = document.createElement("div");
-    document.body.appendChild(this.element);
+    zone.appendChild(this.element);
     this.element.classList.add("mushroom");
     this.element.style.top = top + "px";
     this.element.style.left = left + "px";
